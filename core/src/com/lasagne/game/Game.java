@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 
 public class Game extends ApplicationAdapter {
 
@@ -28,6 +30,8 @@ public class Game extends ApplicationAdapter {
 
     Bird player;
     Camera camera;
+
+    ShapeRenderer sr;
 
     @Override
 	public void create () {
@@ -49,6 +53,8 @@ public class Game extends ApplicationAdapter {
         player = new Bird();
         camera = new OrthographicCamera();
 
+        sr = new ShapeRenderer();
+
         // This handles player movement
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
@@ -69,12 +75,16 @@ public class Game extends ApplicationAdapter {
 	@Override
 	public void render () {
 
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT); // clear screen
 
         stateTime += Gdx.graphics.getDeltaTime();
         currentFrame = walkAnimation.getKeyFrame(stateTime, true);  // get next frame
         spriteBatch.begin();
+        sr.begin(ShapeRenderer.ShapeType.Filled);
+        sr.setColor(0, 0, 1, 1);
+        sr.rect(0, 0, Gdx.graphics.getWidth(), 100);
+        sr.end();
         spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, 0);
         spriteBatch.end();
 
