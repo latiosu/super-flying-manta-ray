@@ -26,7 +26,10 @@ public class Game extends ApplicationAdapter {
     float stateTime;                                        // seconds from start of animation
     Random random;
 
-	@Override
+    Bird player;
+    Camera camera;
+
+    @Override
 	public void create () {
         walkSheet = new Texture(Gdx.files.internal("bird_sprite.png"));
         TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth()/FRAME_COLS, walkSheet.getHeight()/FRAME_ROWS);              // #10
@@ -43,16 +46,39 @@ public class Game extends ApplicationAdapter {
 
         random = new Random();
 
+        player = new Bird();
+        camera = new OrthographicCamera();
+
+        // This handles player movement
+        Gdx.input.setInputProcessor(new InputAdapter() {
+            @Override
+            public boolean touchDown (int x, int y, int pointer, int button) {
+                player.upMove = true;
+                return true; // return true to indicate the event was handled
+            }
+
+            @Override
+            public boolean touchUp (int x, int y, int pointer, int button) {
+                player.upMove = false;
+                return true; // return true to indicate the event was handled
+            }
+        });
+
     }
 
 	@Override
 	public void render () {
+
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT); // clear screen
+
         stateTime += Gdx.graphics.getDeltaTime();
         currentFrame = walkAnimation.getKeyFrame(stateTime, true);  // get next frame
         spriteBatch.begin();
-        spriteBatch.draw(currentFrame, 1300, 300, 16, 16, 32, 32, 8, 8, 0);
+        spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, 0);
         spriteBatch.end();
+
+        player.updateMotion();
 
 	}
 }
