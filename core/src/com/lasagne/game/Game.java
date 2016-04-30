@@ -1,5 +1,6 @@
 package com.lasagne.game;
 
+import java.util.Random;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -23,12 +24,12 @@ public class Game extends ApplicationAdapter {
     TextureRegion                   currentFrame;
 
     float stateTime;                                        // seconds from start of animation
+    Random random;
 
 	@Override
 	public void create () {
         walkSheet = new Texture(Gdx.files.internal("animation_sheet.png"));
-        // use 2D array to read in values then convert to 1D array
-        TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth(), walkSheet.getHeight());
+        TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth()/FRAME_COLS, walkSheet.getHeight()/FRAME_ROWS);              // #10
         walkFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
         int index = 0;
         for (int i = 0; i < FRAME_ROWS; i++) {
@@ -40,15 +41,17 @@ public class Game extends ApplicationAdapter {
         spriteBatch = new SpriteBatch();
         stateTime = 0f;
 
+        random = new Random();
+
     }
 
 	@Override
 	public void render () {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT); // clears screen
-        stateTime += Gdx.graphics.getDeltaTime();
-        currentFrame = walkAnimation.getKeyFrame(stateTime, true); // get frame
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT); // clear screen
+        stateTime += Gdx.graphics.getDeltaTime();           // #15
+        currentFrame = walkAnimation.getKeyFrame(stateTime, true);  // get next frame
         spriteBatch.begin();
-        spriteBatch.draw(currentFrame, 50, 50); // position to render in 
+        spriteBatch.draw(currentFrame, 600, random.nextInt(701) + 200);
         spriteBatch.end();
 
 	}
