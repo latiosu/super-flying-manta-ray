@@ -132,7 +132,7 @@ public class Game extends ApplicationAdapter {
         water.draw(spriteBatch, 1f); // Render water
         spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, (float) player.rotation); // Render Player
         spriteBatch.end();
-        
+
         player.updateMotion();
 
         if (!camera_paused) {
