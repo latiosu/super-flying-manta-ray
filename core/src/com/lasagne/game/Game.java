@@ -39,6 +39,7 @@ public class Game extends ApplicationAdapter {
     float stateTime;                                        // seconds from start of animation
     Random random;
 
+    int oldCameraX = 0;
     Camera camera;
     Bird player;
 
@@ -85,6 +86,9 @@ public class Game extends ApplicationAdapter {
         music = Gdx.audio.newMusic(Gdx.files.internal("theme.mp3"));
         music.setLooping(true);
 
+        player = new Bird();
+        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
         // Font stuff
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -100,40 +104,35 @@ public class Game extends ApplicationAdapter {
         welcomeStyle = new Label.LabelStyle();
         welcomeStyle.font = font;
         welcome = new Label("TAP to fly", welcomeStyle);
-        welcome.setBounds(Gdx.graphics.getWidth() / 2f - welcome.getWidth() / 2f,
-                Gdx.graphics.getHeight() / 2f - welcome.getHeight() / 2f, Gdx.graphics.getWidth(), 20);
+        welcome.setBounds(camera.viewportWidth / 2f - 350,
+                Gdx.graphics.getHeight() / 2f + 300,
+                welcome.getWidth(),
+                welcome.getHeight());
         welcome.setFontScale(10f, 10f);
-
-        player = new Bird();
-        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         // Water
         waterTex = new Texture(Gdx.files.internal("water.png"));
         waterTex.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.Repeat);
-
-        waterTileRepeats = Math.round(Gdx.graphics.getWidth() / waterTex.getWidth() + 4) * 2;
+        waterTileRepeats = Math.round(Gdx.graphics.getWidth() / waterTex.getWidth() + 4) * 4;
         TextureRegion waterRegion = new TextureRegion(waterTex);
         waterRegion.setRegion(0, 0, waterTex.getWidth() * waterTileRepeats, waterTex.getHeight());
-
         TextureRegionDrawable waterDrawable = new TextureRegionDrawable(waterRegion);
         water = new Image();
         water.setDrawable(waterDrawable);
         water.setSize(waterTex.getWidth() * waterTileRepeats, waterTex.getHeight());
-        water.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
+        water.setPosition((float) (player.x - (0.50 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
 
         // Clouds
         cloudTex = new Texture(Gdx.files.internal("clouds.png"));
         cloudTex.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.Repeat);
-
-        cloudTileRepeats = Math.round(Gdx.graphics.getWidth() / cloudTex.getWidth() + 4) * 2;
+        cloudTileRepeats = 100;
         TextureRegion cloudRegion = new TextureRegion(cloudTex);
-        cloudRegion.setRegion(0, 0, cloudTex.getWidth() * cloudTileRepeats, cloudTex.getHeight());
-
+        cloudRegion.setRegion(0, 0, cloudTex.getWidth() * cloudTileRepeats, cloudTex.getHeight() * cloudTileRepeats);
         TextureRegionDrawable cloudDrawable = new TextureRegionDrawable(cloudRegion);
         clouds = new Image();
         clouds.setDrawable(cloudDrawable);
-        clouds.setSize(cloudTex.getWidth() * cloudTileRepeats, cloudTex.getHeight());
-        clouds.setPosition((float) (player.x - (0.75 * cloudTex.getWidth() * cloudTileRepeats)), -Gdx.graphics.getHeight() / 2f);
+        clouds.setSize(cloudTex.getWidth() * cloudTileRepeats, cloudTex.getHeight() * cloudTileRepeats);
+        clouds.setPosition((float) (player.x - (0.75 * cloudTex.getWidth() * cloudTileRepeats)), 0);
 
         sr = new ShapeRenderer();
 
@@ -142,6 +141,9 @@ public class Game extends ApplicationAdapter {
             @Override
             public boolean touchDown (int x, int y, int pointer, int button) {
 
+                if (!firstTouch) {
+                    firstTouch = true;
+                }
 
                 player.upMove = true;
                 player.getPlayerTouch(x,y);
@@ -159,12 +161,8 @@ public class Game extends ApplicationAdapter {
                 return true; // return true to indicate the event was handled
             }
         });
-
-        if (!firstTouch) {
-            firstTouch = true;
-            music.play();
-        }
-
+        
+        music.play();
     }
 
 	@Override
@@ -194,15 +192,15 @@ public class Game extends ApplicationAdapter {
             score.draw(batch, 1f);
             batch.end();
 
-            // Infinite water tile rendering
-            if (camera.position.x <= oldWaterX - camera.viewportWidth) {
-                water.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
-                oldWaterX = (float)player.x;
+            if (Math.abs(camera.position.x - oldCameraX) >= camera.viewportWidth) {
+                water.setPosition((float) (player.x - (0.50 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
+                oldWaterX = (float) player.x;
+                oldCameraX = (int) camera.position.x;
             }
 
             // Infinite cloud tile rendering
             if (camera.position.x <= oldCloudX - camera.viewportWidth) {
-                clouds.setPosition((float) (player.x - (0.75 * cloudTex.getWidth() * cloudTileRepeats)), -Gdx.graphics.getHeight() / 2f);
+                clouds.setPosition((float) (player.x - (0.75 * cloudTex.getWidth() * cloudTileRepeats)), 0);
                 oldCloudX = (float) player.x;
             }
 

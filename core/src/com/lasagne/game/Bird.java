@@ -77,8 +77,8 @@ public class Bird {
 
     public void rightTouch() {
         seed = 5 * Math.random();
-        velY = -8;
-        velX = velX + 5 + seed;
+        velY = -12;
+        velX = velX + seed;
     }
 
     public void rotateBird() {
