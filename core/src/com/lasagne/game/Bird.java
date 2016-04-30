@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 public class Bird {
     Texture bird;
     boolean upMove;
-    double width, height, x, y, velX, velY, accX, accY, maxX, maxY, rotation, distance;
+    double width, height, x, y, velX, velY, accX, accY, maxX, maxY, rotation, distance, seed;
 
     public Bird() {
         bird = new Texture("bird-solo.png");
@@ -23,7 +23,7 @@ public class Bird {
         accX = 0;
         velX = -40;
         velY = -40;
-        maxX = 40;
+        maxX = 20;
         maxY = 40;
         distance = 0;
         rotation = 0;
@@ -70,13 +70,15 @@ public class Bird {
     }
 
     public void leftTouch() {
-        velY = velY - 10;
-        velX = velX - 10;
+        seed = 5 * Math.random();
+        velY = velY - 5 - seed;
+        velX = velX - 5;
     }
 
     public void rightTouch() {
-        velY = -20;
-        velX = velX + 5;
+        seed = 5 * Math.random();
+        velY = -8;
+        velX = velX + 5 + seed;
     }
 
     public void rotateBird() {
