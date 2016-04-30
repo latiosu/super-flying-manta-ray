@@ -35,18 +35,10 @@ public class Bird {
             velX = -20;
         } else {
             velY = velY + accY;
-            velX = 1;
         }
         // Check if running
         if (!running) {
             return;
-        }
-        // Check stringray is within boundaries
-        if (x < 200) {
-            velX = 0;
-        }
-        if (x > 1350) {
-            velX = 1;
         }
         // Update x & y positions
         x = x + velX;

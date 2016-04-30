@@ -31,6 +31,7 @@ public class Game extends ApplicationAdapter {
 
     Bird player;
     Camera camera;
+    Texture background;
 
     ShapeRenderer sr;
 
@@ -53,6 +54,7 @@ public class Game extends ApplicationAdapter {
 
         player = new Bird();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        background = new Texture(Gdx.files.internal("background.png"));
 
         sr = new ShapeRenderer();
 
@@ -86,16 +88,16 @@ public class Game extends ApplicationAdapter {
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(0, 0, 1, 1);
         sr.rect(0, 0, Gdx.graphics.getWidth(), 100);
-        sr.rect(0, 500, Gdx.graphics.getWidth(), 2);
         sr.end();
 
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
+        spriteBatch.draw(background, 0, 0, background.getWidth(), background.getHeight());
         spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, 0);
         spriteBatch.end();
 
         player.updateMotion();
-        camera.translate((float)((player.x - camera.position.x)/8.0), (float) ((player.y - camera.position.y)/8.0), 0);
+        camera.translate((float)((player.x - camera.position.x)/10.0), (float) ((player.y - camera.position.y)/10.0), 0);
         camera.update();
 	}
 }
