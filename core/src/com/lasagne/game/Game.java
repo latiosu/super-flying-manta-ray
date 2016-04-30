@@ -42,6 +42,7 @@ public class Game extends ApplicationAdapter {
     float oldX = 0;
     BitmapFont font;
     SpriteBatch batch;
+    boolean camera_paused = false;
 
     Label score;
     Label.LabelStyle scoreStyle;
@@ -114,8 +115,10 @@ public class Game extends ApplicationAdapter {
 	@Override
 	public void render () {
         if (player.y <= water.getY()) {
+            camera_paused = true;
             exitGame();
         }
+
 
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT); // clear screen
@@ -128,26 +131,24 @@ public class Game extends ApplicationAdapter {
         water.draw(spriteBatch, 1f); // Render water
         spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, (float) player.rotation); // Render Player
         spriteBatch.end();
-
-        batch.begin();
-        //font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
-        font.setColor(Color.BLACK);
-        //font.draw
-//        font.getData().setScale(9,9);
-//        font.draw(batch, String.valueOf(player.distance), 500, 500, 1000, 1000, true);
-        score.setText(String.valueOf(Math.abs((int) player.distance/100000)));
-        score.draw(batch, 1f);
-        batch.end();
-
+        
         player.updateMotion();
 
-        if (camera.position.x <= oldX - camera.viewportWidth) {
-            water.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
-            oldX = (float)player.x;
-        }
+        if (!camera_paused) {
+            batch.begin();
+            font.setColor(Color.BLACK);
+            score.setText(String.valueOf(Math.abs((int) player.distance/100000)));
+            score.draw(batch, 1f);
+            batch.end();
 
-        camera.translate((float)((player.x - camera.position.x) / 10.0), (float) ((player.y - camera.position.y) / 10.0), 0);
-        camera.update();
+            if (camera.position.x <= oldX - camera.viewportWidth) {
+                water.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
+                oldX = (float)player.x;
+            }
+
+            camera.translate((float) ((player.x - camera.position.x) / 10.0), (float) ((player.y - camera.position.y) / 10.0), 0);
+            camera.update();
+        }
 	}
 
     public void exitGame() {
