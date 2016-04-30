@@ -6,8 +6,8 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 public class Bird {
     Texture bird;
-    boolean upMove, running;
-    double width, height, x, y, velX, velY, accX, accY, maxX, maxY, rotation;
+    boolean upMove;
+    double width, height, x, y, velX, velY, accX, accY, maxX, maxY, rotation, distance;
 
     public Bird() {
         bird = new Texture("bird-solo.png");
@@ -18,19 +18,15 @@ public class Bird {
         y = 10;
         accY = 1;
         accX = 0;
-        velX = -25;
-        velY = -25;
-        maxX = 30;
-        maxY = 30;
-        running = false;
+        velX = -40;
+        velY = -40;
+        maxX = 40;
+        maxY = 40;
+        distance = 0;
         rotation = 0;
     }
 
     public void updateMotion() {
-        if (upMove) {
-            // Start motion
-            running = true;
-        }
 
 //        // Check if running
 //        if (!running) {
@@ -43,6 +39,7 @@ public class Bird {
 
         // Update x & y positions
         x = x + velX;
+        distance += x;
         y = y - (velY + accY / 2);
         if (Math.abs(velY) > maxY) {
             velY = maxY;

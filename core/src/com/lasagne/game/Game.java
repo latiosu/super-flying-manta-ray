@@ -93,7 +93,6 @@ public class Game extends ApplicationAdapter {
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
         spriteBatch.draw(background, 0, 0, background.getWidth(), background.getHeight());
-        System.out.println("rotation:"+player.rotation);
         spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, (float) player.rotation);
         spriteBatch.end();
 
