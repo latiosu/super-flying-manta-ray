@@ -2,7 +2,6 @@ package com.lasagne.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.physics.box2d.Body;
 
 public class Bird {
     Texture bird;
@@ -14,6 +13,10 @@ public class Bird {
         upMove = false;
         width = (int) (Gdx.graphics.getWidth() * 0.3f);
         height = (int) (Gdx.graphics.getHeight() * 0.3f);
+        init();
+    }
+
+    public void init() {
         x = 10;
         y = 10;
         accY = 1;
@@ -41,11 +44,17 @@ public class Bird {
         x = x + velX;
         distance += x;
         y = y - (velY + accY / 2);
-        if (Math.abs(velY) > maxY) {
+        if (velY > maxY) {
             velY = maxY;
         }
-        if (Math.abs(velX) > maxX) {
+        if (velY < -maxY) {
+            velY = -maxY;
+        }
+        if (velX > maxX) {
             velX = maxX;
+        }
+        if (velX < -maxX) {
+            velX = -maxX;
         }
         // rotate bird
         rotateBird();

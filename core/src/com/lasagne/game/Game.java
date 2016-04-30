@@ -25,6 +25,8 @@ public class Game extends ApplicationAdapter {
     private static final int        FRAME_COLS = 5;
     private static final int        FRAME_ROWS = 1;
 
+    boolean firstTouch = false;
+
     Animation walkAnimation;          // animation obj
     Texture                         walkSheet;              // sprite sheet
     TextureRegion[]                 walkFrames;             // frames of animation
@@ -46,6 +48,8 @@ public class Game extends ApplicationAdapter {
 
     Label score;
     Label.LabelStyle scoreStyle;
+    Label welcome;
+    Label.LabelStyle welcomeStyle;
 
     ShapeRenderer sr;
 
@@ -66,14 +70,25 @@ public class Game extends ApplicationAdapter {
         stateTime = 0f;
 
         random = new Random();
+
+        // Font stuff
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
+        // Score (font stuff)
         scoreStyle = new Label.LabelStyle();
         scoreStyle.font = font;
-
         score = new Label("", scoreStyle);
         score.setBounds(100, 100, Gdx.graphics.getWidth(), 20);
         score.setFontScale(10f, 10f);
+
+        // Welcome (font stuff)
+        welcomeStyle = new Label.LabelStyle();
+        welcomeStyle.font = font;
+        welcome = new Label("TAP to fly", welcomeStyle);
+        welcome.setBounds(Gdx.graphics.getWidth() / 2f - welcome.getWidth() / 2f,
+                Gdx.graphics.getHeight() / 2f - welcome.getHeight() / 2f, Gdx.graphics.getWidth(), 20);
+        welcome.setFontScale(10f, 10f);
 
         player = new Bird();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -98,8 +113,17 @@ public class Game extends ApplicationAdapter {
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean touchDown (int x, int y, int pointer, int button) {
+                if (!firstTouch) {
+                    firstTouch = true;
+                }
+
                 player.upMove = true;
                 player.getPlayerTouch(x,y);
+
+                if (camera_paused && x >= 0 && x <= 200 && y >= Gdx.graphics.getHeight() - 200 && y <= Gdx.graphics.getHeight()) {
+                    restartGame();
+                }
+
                 return true; // return true to indicate the event was handled
             }
 
@@ -110,19 +134,17 @@ public class Game extends ApplicationAdapter {
             }
         });
 
-        addDialogs();
     }
 
 	@Override
 	public void render () {
-        if (player.y <= 0) {
-            camera_paused = true;
-            exitGame();
-        }
 
-
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0.77f, 0.77f, 0.98f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT); // clear screen
+
+        if (player.y <= -10) {
+            camera_paused = true;
+        }
 
         stateTime += Gdx.graphics.getDeltaTime();
         currentFrame = walkAnimation.getKeyFrame(stateTime, true);  // get next frame
@@ -132,13 +154,11 @@ public class Game extends ApplicationAdapter {
         water.draw(spriteBatch, 1f); // Render water
         spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, (float) player.rotation); // Render Player
         spriteBatch.end();
-        
-        player.updateMotion();
 
         if (!camera_paused) {
             batch.begin();
             font.setColor(Color.BLACK);
-            score.setText(String.valueOf(Math.abs((int) player.distance/100000)));
+            score.setText(calcScore(player.distance));
             score.draw(batch, 1f);
             batch.end();
 
@@ -149,12 +169,44 @@ public class Game extends ApplicationAdapter {
 
             camera.translate((float) ((player.x - camera.position.x) / 10.0), (float) ((player.y - camera.position.y) / 10.0), 0);
             camera.update();
+        } else {
+            // If camera is paused - assume game ended
+            sr.begin(ShapeRenderer.ShapeType.Filled);
+//            sr.setColor(0, 0, 0, 1.3f);
+            sr.setColor(Color.YELLOW);
+            sr.rect(0, 0, 200, 200);
+            sr.end();
         }
-	}
 
-    public void exitGame() {
-        // do something
+        if (!firstTouch) {
+            batch.begin();
+            font.setColor(Color.BLACK);
+            welcome.draw(batch, 1f);
+            batch.end();
+            return;
+        }
+        player.updateMotion();
     }
 
+    public void restartGame() {
+        // reset player position
+        player.init();
+
+        // reset bg position
+        water.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
+
+        // reset camera position
+        camera.position.x =  (float) player.x;
+        camera.position.y = (float) player.y;
+        camera.update();
+
+        // re-enable camera
+        camera_paused = false;
+
+    }
+
+    public String calcScore(double distance) {
+        return String.valueOf(Math.abs((int) player.distance/100000));
+    }
 
 }
