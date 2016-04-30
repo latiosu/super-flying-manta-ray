@@ -30,6 +30,9 @@ public class Bird {
     }
 
     public void updateMotion() {
+        if (y < -500) {
+            return;
+        }
 
 //        // Check if running
 //        if (!running) {

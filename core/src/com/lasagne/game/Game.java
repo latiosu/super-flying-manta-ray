@@ -148,7 +148,7 @@ public class Game extends ApplicationAdapter {
                 player.upMove = true;
                 player.getPlayerTouch(x,y);
 
-                if (camera_paused && x >= 0 && x <= 200 && y >= Gdx.graphics.getHeight() - 200 && y <= Gdx.graphics.getHeight()) {
+                if (camera_paused && x >= 0 && x <= Gdx.graphics.getWidth() && y >= 0 && y <= Gdx.graphics.getHeight()) {
                     restartGame();
                 }
 
@@ -161,7 +161,7 @@ public class Game extends ApplicationAdapter {
                 return true; // return true to indicate the event was handled
             }
         });
-        
+
         music.play();
     }
 
@@ -208,11 +208,12 @@ public class Game extends ApplicationAdapter {
             camera.update();
         } else {
             // If camera is paused - assume game ended
-            sr.begin(ShapeRenderer.ShapeType.Filled);
-//            sr.setColor(0, 0, 0, 1.3f);
-            sr.setColor(Color.YELLOW);
-            sr.rect(0, 0, 200, 200);
-            sr.end();
+            batch.begin();
+            font.setColor(Color.BLACK);
+            score.setText(calcScore(player.distance));
+            score.draw(batch, 1f);
+            batch.end();
+
         }
 
         if (!firstTouch) {
@@ -220,7 +221,6 @@ public class Game extends ApplicationAdapter {
             font.setColor(Color.BLACK);
             welcome.draw(batch, 1f);
             batch.end();
-            return;
         }
         player.updateMotion();
     }
@@ -243,7 +243,7 @@ public class Game extends ApplicationAdapter {
     }
 
     public String calcScore(double distance) {
-        return String.valueOf(Math.abs((int) player.distance/100000));
+        return "Score: " + String.valueOf(Math.abs((int) player.distance/100000));
     }
 
     @Override
