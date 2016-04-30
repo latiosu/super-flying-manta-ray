@@ -4,15 +4,19 @@ import java.util.Random;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 
@@ -36,6 +40,11 @@ public class Game extends ApplicationAdapter {
     Texture waterTex;
     int waterTileRepeats;
     float oldX = 0;
+    BitmapFont font;
+    SpriteBatch batch;
+
+    Label score;
+    Label.LabelStyle scoreStyle;
 
     ShapeRenderer sr;
 
@@ -52,9 +61,18 @@ public class Game extends ApplicationAdapter {
         }
         walkAnimation = new Animation(0.2f, walkFrames);      // create animation
         spriteBatch = new SpriteBatch();
+        batch = new SpriteBatch();
         stateTime = 0f;
 
         random = new Random();
+        font = new BitmapFont();
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        scoreStyle = new Label.LabelStyle();
+        scoreStyle.font = font;
+
+        score = new Label("", scoreStyle);
+        score.setBounds(100, 100, Gdx.graphics.getWidth(), 20);
+        score.setFontScale(10f, 10f);
 
         player = new Bird();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -95,6 +113,9 @@ public class Game extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+        if (player.y <= water.getY()) {
+            exitGame();
+        }
 
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT); // clear screen
@@ -108,6 +129,16 @@ public class Game extends ApplicationAdapter {
         spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, (float) player.rotation); // Render Player
         spriteBatch.end();
 
+        batch.begin();
+        //font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
+        font.setColor(Color.BLACK);
+        //font.draw
+//        font.getData().setScale(9,9);
+//        font.draw(batch, String.valueOf(player.distance), 500, 500, 1000, 1000, true);
+        score.setText(String.valueOf(Math.abs((int) player.distance/100000)));
+        score.draw(batch, 1f);
+        batch.end();
+
         player.updateMotion();
 
         if (camera.position.x <= oldX - camera.viewportWidth) {
@@ -118,4 +149,8 @@ public class Game extends ApplicationAdapter {
         camera.translate((float)((player.x - camera.position.x) / 10.0), (float) ((player.y - camera.position.y) / 10.0), 0);
         camera.update();
 	}
+
+    public void exitGame() {
+        // do something
+    }
 }
