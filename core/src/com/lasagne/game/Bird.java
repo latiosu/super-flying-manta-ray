@@ -14,8 +14,8 @@ public class Bird {
         upMove = false;
         width = (int) (Gdx.graphics.getWidth() * 0.3f);
         height = (int) (Gdx.graphics.getHeight() * 0.3f);
-        x = 500;
-        y = 500;
+        x = 10;
+        y = 10;
         accY = 1;
         velX = 0;
         running = false;
@@ -32,21 +32,21 @@ public class Bird {
             } else {
                 velY = -20;
             }
-            velX = 5;
+            velX = -20;
         } else {
             velY = velY + accY;
-            velX = -1;
+            velX = 1;
         }
         // Check if running
         if (!running) {
             return;
         }
         // Check stringray is within boundaries
-        if (x < 300) {
+        if (x < 200) {
             velX = 0;
         }
         if (x > 1350) {
-            velX = -1;
+            velX = 1;
         }
         // Update x & y positions
         x = x + velX;
@@ -56,5 +56,20 @@ public class Bird {
         }
     }
 
+    public void getPlayerTouch(int x,int y) {
+        if (x <= (Gdx.graphics.getWidth()/2)) {
+            leftTouch();
+        } else {
+            rightTouch();
+        }
+    }
+
+    public void leftTouch() {
+        System.out.println("left touch!");
+    }
+
+    public void rightTouch() {
+        System.out.println("right touch!");
+    }
 
 }

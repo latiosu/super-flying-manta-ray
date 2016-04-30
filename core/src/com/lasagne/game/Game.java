@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 
 
 public class Game extends ApplicationAdapter {
@@ -51,7 +52,7 @@ public class Game extends ApplicationAdapter {
         random = new Random();
 
         player = new Bird();
-        camera = new OrthographicCamera();
+        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         sr = new ShapeRenderer();
 
@@ -60,6 +61,7 @@ public class Game extends ApplicationAdapter {
             @Override
             public boolean touchDown (int x, int y, int pointer, int button) {
                 player.upMove = true;
+                player.getPlayerTouch(x,y);
                 return true; // return true to indicate the event was handled
             }
 
@@ -80,15 +82,20 @@ public class Game extends ApplicationAdapter {
 
         stateTime += Gdx.graphics.getDeltaTime();
         currentFrame = walkAnimation.getKeyFrame(stateTime, true);  // get next frame
-        spriteBatch.begin();
+
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(0, 0, 1, 1);
         sr.rect(0, 0, Gdx.graphics.getWidth(), 100);
+        sr.rect(0, 500, Gdx.graphics.getWidth(), 2);
         sr.end();
+
+        spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.begin();
         spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, 0);
         spriteBatch.end();
 
         player.updateMotion();
-
+        camera.translate((float)((player.x - camera.position.x)/8.0), (float) ((player.y - camera.position.y)/8.0), 0);
+        camera.update();
 	}
 }
