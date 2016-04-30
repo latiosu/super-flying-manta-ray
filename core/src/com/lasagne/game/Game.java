@@ -3,6 +3,7 @@ package com.lasagne.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -32,6 +33,8 @@ public class Game extends ApplicationAdapter {
     TextureRegion[]                 walkFrames;             // frames of animation
     SpriteBatch                     spriteBatch;            // put texture on screen
     TextureRegion                   currentFrame;
+
+    Music music;
 
     float stateTime;                                        // seconds from start of animation
     Random random;
@@ -77,6 +80,10 @@ public class Game extends ApplicationAdapter {
         stateTime = 0f;
 
         random = new Random();
+
+        // Music stuff
+        music = Gdx.audio.newMusic(Gdx.files.internal("theme.mp3"));
+        music.setLooping(true);
 
         // Font stuff
         font = new BitmapFont();
@@ -136,6 +143,7 @@ public class Game extends ApplicationAdapter {
             public boolean touchDown (int x, int y, int pointer, int button) {
                 if (!firstTouch) {
                     firstTouch = true;
+                    music.play();
                 }
 
                 player.upMove = true;
@@ -237,5 +245,11 @@ public class Game extends ApplicationAdapter {
     public String calcScore(double distance) {
         return String.valueOf(Math.abs((int) player.distance/100000));
     }
+
+    @Override
+    public void dispose() {
+        music.dispose();
+    }
+
 
 }
