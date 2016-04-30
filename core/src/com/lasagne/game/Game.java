@@ -141,10 +141,7 @@ public class Game extends ApplicationAdapter {
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean touchDown (int x, int y, int pointer, int button) {
-                if (!firstTouch) {
-                    firstTouch = true;
-                    music.play();
-                }
+
 
                 player.upMove = true;
                 player.getPlayerTouch(x,y);
@@ -162,6 +159,11 @@ public class Game extends ApplicationAdapter {
                 return true; // return true to indicate the event was handled
             }
         });
+
+        if (!firstTouch) {
+            firstTouch = true;
+            music.play();
+        }
 
     }
 
