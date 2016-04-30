@@ -6,24 +6,29 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 public class Bird {
     Texture bird;
-    Body body;
     boolean upMove;
-    int width, height, speed, x, y, velX, velY, accX, accY;
+    double width, height, x, y, velX, velY, accX, accY;
+
 
     public Bird() {
         bird = new Texture("bird-solo.png");
         upMove = false;
         width = (int) (Gdx.graphics.getWidth() * 0.3f);
         height = (int) (Gdx.graphics.getHeight() * 0.3f);
-        speed = 700;
-
+        x = 0;
+        y = 1000;
+        accY = 1;
     }
 
     public void updateMotion() {
         if (upMove) {
             // Own physics code here
-            System.out.println(body.getPosition().x);
+            System.out.println(y);
+            velY = -20;
+        } else {
+            velY = velY + accY;
         }
+        y = y - (velY + accY / 2);
     }
 
 

@@ -43,7 +43,7 @@ public class Game extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();
-        batch.draw(player.bird, player.x, player.y, player.width, player.height);
+        batch.draw(player.bird, (int) player.x, (int) player.y, (int) player.width, (int) player.height);
 		batch.end();
 
         // Update bird positions before rendering
