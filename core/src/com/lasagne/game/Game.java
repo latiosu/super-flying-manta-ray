@@ -30,12 +30,18 @@ public class Game extends ApplicationAdapter {
     float stateTime;                                        // seconds from start of animation
     Random random;
 
-    Bird player;
     Camera camera;
+
+    Bird player;
     Image water;
     Texture waterTex;
     int waterTileRepeats;
-    float oldX = 0;
+    float oldWaterX = 0;
+
+    Image clouds;
+    Texture cloudTex;
+    int cloudTileRepeats;
+    float oldCloudX = 0;
 
     ShapeRenderer sr;
 
@@ -59,6 +65,7 @@ public class Game extends ApplicationAdapter {
         player = new Bird();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+        // Water
         waterTex = new Texture(Gdx.files.internal("water.png"));
         waterTex.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.Repeat);
 
@@ -72,6 +79,19 @@ public class Game extends ApplicationAdapter {
         water.setSize(waterTex.getWidth() * waterTileRepeats, waterTex.getHeight());
         water.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
 
+        // Clouds
+        cloudTex = new Texture(Gdx.files.internal("clouds.png"));
+        cloudTex.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.Repeat);
+
+        cloudTileRepeats = Math.round(Gdx.graphics.getWidth() / cloudTex.getWidth() + 4) * 2;
+        TextureRegion cloudRegion = new TextureRegion(cloudTex);
+        cloudRegion.setRegion(0, 0, cloudTex.getWidth() * cloudTileRepeats, cloudTex.getHeight());
+
+        TextureRegionDrawable cloudDrawable = new TextureRegionDrawable(cloudRegion);
+        clouds = new Image();
+        clouds.setDrawable(cloudDrawable);
+        clouds.setSize(cloudTex.getWidth() * cloudTileRepeats, cloudTex.getHeight());
+        clouds.setPosition((float) (player.x - (0.75 * cloudTex.getWidth() * cloudTileRepeats)), -Gdx.graphics.getHeight() / 2f);
 
         sr = new ShapeRenderer();
 
@@ -96,7 +116,7 @@ public class Game extends ApplicationAdapter {
 	@Override
 	public void render () {
 
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0.53f, 0.81f, 0.98f, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT); // clear screen
 
         stateTime += Gdx.graphics.getDeltaTime();
@@ -104,15 +124,23 @@ public class Game extends ApplicationAdapter {
 
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
+        clouds.draw(spriteBatch, 1f); // Render clouds
         water.draw(spriteBatch, 1f); // Render water
         spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, (float) player.rotation); // Render Player
         spriteBatch.end();
 
         player.updateMotion();
 
-        if (camera.position.x <= oldX - camera.viewportWidth) {
+        // Infinite water tile rendering
+        if (camera.position.x <= oldWaterX - camera.viewportWidth) {
             water.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
-            oldX = (float)player.x;
+            oldWaterX = (float)player.x;
+        }
+
+        // Infinite cloud tile rendering
+        if (camera.position.x <= oldWaterX - camera.viewportWidth) {
+            clouds.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * cloudTileRepeats)), -Gdx.graphics.getHeight() / 2f);
+            oldWaterX = (float) player.x;
         }
 
         camera.translate((float)((player.x - camera.position.x) / 10.0), (float) ((player.y - camera.position.y) / 10.0), 0);
