@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 public class Bird {
     Texture bird;
-    Body body;
     boolean upMove;
     int width, height, speed, x, y, velX, velY, accX, accY;
 
@@ -22,7 +21,6 @@ public class Bird {
     public void updateMotion() {
         if (upMove) {
             // Own physics code here
-            System.out.println(body.getPosition().x);
         }
     }
 
