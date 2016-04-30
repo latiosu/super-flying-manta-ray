@@ -14,8 +14,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Game extends ApplicationAdapter {
 
-    private static final int        FRAME_COLS = 6;
-    private static final int        FRAME_ROWS = 5;
+    private static final int        FRAME_COLS = 5;
+    private static final int        FRAME_ROWS = 1;
 
     Animation walkAnimation;          // animation obj
     Texture                         walkSheet;              // sprite sheet
@@ -28,7 +28,7 @@ public class Game extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-        walkSheet = new Texture(Gdx.files.internal("animation_sheet.png"));
+        walkSheet = new Texture(Gdx.files.internal("bird_sprite.png"));
         TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth()/FRAME_COLS, walkSheet.getHeight()/FRAME_ROWS);              // #10
         walkFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
         int index = 0;
@@ -37,7 +37,7 @@ public class Game extends ApplicationAdapter {
                 walkFrames[index++] = tmp[i][j];
             }
         }
-        walkAnimation = new Animation(0.025f, walkFrames);      // create animation
+        walkAnimation = new Animation(0.2f, walkFrames);      // create animation
         spriteBatch = new SpriteBatch();
         stateTime = 0f;
 
@@ -48,10 +48,10 @@ public class Game extends ApplicationAdapter {
 	@Override
 	public void render () {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT); // clear screen
-        stateTime += Gdx.graphics.getDeltaTime();           // #15
+        stateTime += Gdx.graphics.getDeltaTime();
         currentFrame = walkAnimation.getKeyFrame(stateTime, true);  // get next frame
         spriteBatch.begin();
-        spriteBatch.draw(currentFrame, 600, random.nextInt(701) + 200);
+        spriteBatch.draw(currentFrame, 1300, 300, 16, 16, 32, 32, 8, 8, 0);
         spriteBatch.end();
 
 	}
