@@ -7,7 +7,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 public class Bird {
     Texture bird;
     boolean upMove, running;
-    double width, height, x, y, velX, velY, accX, accY;
+    double width, height, x, y, velX, velY, accX, accY, maxX, maxY, rotation;
 
     public Bird() {
         bird = new Texture("bird-solo.png");
@@ -17,37 +17,44 @@ public class Bird {
         x = 10;
         y = 10;
         accY = 1;
-        velX = 0;
+        accX = 0;
+        velX = -25;
+        velY = -25;
+        maxX = 30;
+        maxY = 30;
         running = false;
+        rotation = 0;
     }
 
     public void updateMotion() {
         if (upMove) {
             // Start motion
             running = true;
+        }
 
-            // Check stingray hasn't left the screen
-            if (y > Gdx.graphics.getHeight()) {
-                velY = 0;
-            } else {
-                velY = -20;
-            }
-            velX = -20;
-        } else {
-            velY = velY + accY;
-        }
-        // Check if running
-        if (!running) {
-            return;
-        }
+//        // Check if running
+//        if (!running) {
+//            return;
+//        }
+
+        // Update velocities
+        velY = velY + accY;
+        velX = velX + accX;
+
         // Update x & y positions
         x = x + velX;
         y = y - (velY + accY / 2);
-        if (y <= 0) {
-            y = 0;
+        if (Math.abs(velY) > maxY) {
+            velY = maxY;
         }
+        if (Math.abs(velX) > maxX) {
+            velX = maxX;
+        }
+        // rotate bird
+        rotateBird();
     }
 
+    // Check which side of screen player touched
     public void getPlayerTouch(int x,int y) {
         if (x <= (Gdx.graphics.getWidth()/2)) {
             leftTouch();
@@ -57,11 +64,19 @@ public class Bird {
     }
 
     public void leftTouch() {
-        System.out.println("left touch!");
+        velY = velY - 10;
+        velX = velX - 10;
     }
 
     public void rightTouch() {
-        System.out.println("right touch!");
+        velY = -20;
+        velX = velX + 5;
+    }
+
+    public void rotateBird() {
+        double ratio;
+        ratio = (velY/velX);
+        rotation = 360 - Math.toDegrees(Math.atan(ratio));
     }
 
 }
