@@ -12,7 +12,8 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 
 public class Game extends ApplicationAdapter {
@@ -31,7 +32,10 @@ public class Game extends ApplicationAdapter {
 
     Bird player;
     Camera camera;
-    Texture background;
+    Image water;
+    Texture waterTex;
+    int waterTileRepeats;
+    float oldX = 0;
 
     ShapeRenderer sr;
 
@@ -54,7 +58,20 @@ public class Game extends ApplicationAdapter {
 
         player = new Bird();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        background = new Texture(Gdx.files.internal("background.png"));
+
+        waterTex = new Texture(Gdx.files.internal("water.png"));
+        waterTex.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.Repeat);
+
+        waterTileRepeats = Math.round(Gdx.graphics.getWidth() / waterTex.getWidth() + 4) * 2;
+        TextureRegion waterRegion = new TextureRegion(waterTex);
+        waterRegion.setRegion(0, 0, waterTex.getWidth() * waterTileRepeats, waterTex.getHeight());
+
+        TextureRegionDrawable waterDrawable = new TextureRegionDrawable(waterRegion);
+        water = new Image();
+        water.setDrawable(waterDrawable);
+        water.setSize(waterTex.getWidth() * waterTileRepeats, waterTex.getHeight());
+        water.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
+
 
         sr = new ShapeRenderer();
 
@@ -85,19 +102,20 @@ public class Game extends ApplicationAdapter {
         stateTime += Gdx.graphics.getDeltaTime();
         currentFrame = walkAnimation.getKeyFrame(stateTime, true);  // get next frame
 
-        sr.begin(ShapeRenderer.ShapeType.Filled);
-        sr.setColor(0, 0, 1, 1);
-        sr.rect(0, 0, Gdx.graphics.getWidth(), 100);
-        sr.end();
-
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        spriteBatch.draw(background, 0, 0, background.getWidth(), background.getHeight());
-        spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, (float) player.rotation);
+        water.draw(spriteBatch, 1f); // Render water
+        spriteBatch.draw(currentFrame, (float) player.x, (float) player.y, 16, 16, 32, 32, 8, 8, 0); // Render Player
         spriteBatch.end();
 
         player.updateMotion();
-        camera.translate((float)((player.x - camera.position.x)/10.0), (float) ((player.y - camera.position.y)/10.0), 0);
+
+        if (camera.position.x <= oldX - camera.viewportWidth) {
+            water.setPosition((float) (player.x - (0.75 * waterTex.getWidth() * waterTileRepeats)), -Gdx.graphics.getHeight() / 2f);
+            oldX = (float)player.x;
+        }
+
+        camera.translate((float)((player.x - camera.position.x) / 10.0), (float) ((player.y - camera.position.y) / 10.0), 0);
         camera.update();
 	}
 }
