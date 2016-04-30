@@ -43,6 +43,9 @@ public class Bird {
         // Update x & y positions
         x = x + velX;
         y = y - (velY + accY / 2);
+        if (y <= 0) {
+            y = 0;
+        }
     }
 
 
