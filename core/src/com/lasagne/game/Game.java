@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -41,7 +42,10 @@ public class Game extends ApplicationAdapter {
 
     int oldCameraX = 0;
     Camera camera;
-    Bird player;
+    Player player;
+
+    Sound pop;
+    long popId;
 
     Image water;
     Texture waterTex;
@@ -66,7 +70,7 @@ public class Game extends ApplicationAdapter {
 
     @Override
 	public void create () {
-        walkSheet = new Texture(Gdx.files.internal("bird_sprite.png"));
+        walkSheet = new Texture(Gdx.files.internal("manta_sprite.png"));
         TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth()/FRAME_COLS, walkSheet.getHeight()/FRAME_ROWS);              // #10
         walkFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
         int index = 0;
@@ -86,7 +90,10 @@ public class Game extends ApplicationAdapter {
         music = Gdx.audio.newMusic(Gdx.files.internal("theme.mp3"));
         music.setLooping(true);
 
-        player = new Bird();
+        // SFX
+        pop = Gdx.audio.newSound(Gdx.files.internal("pop.ogg"));
+
+        player = new Player();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         // Font stuff
@@ -103,9 +110,9 @@ public class Game extends ApplicationAdapter {
         // Welcome (font stuff)
         welcomeStyle = new Label.LabelStyle();
         welcomeStyle.font = font;
-        welcome = new Label("TAP to fly", welcomeStyle);
-        welcome.setBounds(camera.viewportWidth / 2f - 350,
-                Gdx.graphics.getHeight() / 2f + 300,
+        welcome = new Label("Super Flying Manta Ray", welcomeStyle);
+        welcome.setBounds(camera.viewportWidth / 2f - 780,
+                Gdx.graphics.getHeight() / 2f,
                 welcome.getWidth(),
                 welcome.getHeight());
         welcome.setFontScale(10f, 10f);
@@ -151,6 +158,9 @@ public class Game extends ApplicationAdapter {
                 if (camera_paused && x >= 0 && x <= Gdx.graphics.getWidth() && y >= 0 && y <= Gdx.graphics.getHeight()) {
                     restartGame();
                 }
+
+                popId = pop.play(0.65f);
+                pop.setPitch(popId, (float) Math.random());
 
                 return true; // return true to indicate the event was handled
             }
@@ -206,14 +216,13 @@ public class Game extends ApplicationAdapter {
 
             camera.translate((float) ((player.x - camera.position.x) / 10.0), (float) ((player.y - camera.position.y) / 10.0), 0);
             camera.update();
-        } else {
+        } else if (!firstTouch) {
             // If camera is paused - assume game ended
             batch.begin();
             font.setColor(Color.BLACK);
             score.setText(calcScore(player.distance));
             score.draw(batch, 1f);
             batch.end();
-
         }
 
         if (!firstTouch) {
@@ -221,6 +230,7 @@ public class Game extends ApplicationAdapter {
             font.setColor(Color.BLACK);
             welcome.draw(batch, 1f);
             batch.end();
+            return;
         }
         player.updateMotion();
     }
